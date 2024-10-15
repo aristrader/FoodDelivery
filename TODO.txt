@@ -1,0 +1,2 @@
+1. Masking of passwords
+2.have the checks for the phone number
