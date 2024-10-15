@@ -19,11 +19,11 @@ CREATE TABLE chef (
     payment_upi_no BIGINT,
     payment_upi_id VARCHAR(100),
     society_id VARCHAR(36) NOT NULL,
-    open_closed BOOLEAN NOT NULL DEFAULT FALSE,
+    is_open BOOLEAN NOT NULL DEFAULT FALSE,
     auto_close_time TIME,
-    pickup BOOLEAN DEFAULT TRUE,
-    delivery BOOLEAN DEFAULT FALSE,
-    approx_delivery_time_in_minutes INT,
+    allows_pickup BOOLEAN DEFAULT TRUE,
+    has_delivery BOOLEAN DEFAULT FALSE,
+    estimated_delivery_time_minutes INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (society_id) REFERENCES society(society_id)
@@ -36,21 +36,29 @@ CREATE TABLE customer (
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    address VARCHAR(255),
-    ph_no BIGINT NOT NULL UNIQUE,
+    phone_number BIGINT NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE customer_address (
+    address_id VARCHAR(36) PRIMARY KEY,
+    customer_id VARCHAR(36) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 );
 
 -- Creating the Items table with the new constraint on chef_id
 CREATE TABLE items (
     item_id VARCHAR(36) PRIMARY KEY,
     chef_id VARCHAR(36) NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-    price INT NOT NULL,
-    active_or_not BOOLEAN NOT NULL DEFAULT TRUE,
-    auto_close_order_count INT,
+    item_name VARCHAR(100) NOT NULL,
+    item_description VARCHAR(255),
+    item_price INT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    auto_close_order_limit INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (chef_id) REFERENCES chef(chef_id)
@@ -73,17 +81,18 @@ CREATE TABLE orders (
     order_id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,
     chef_id VARCHAR(36) NOT NULL,
-    customer_address VARCHAR(255) NOT NULL,
+    customer_address_id VARCHAR(36) NOT NULL,
     order_time DATETIME NOT NULL,
     order_status VARCHAR(30) NOT NULL,
-    pickup BOOLEAN NOT NULL DEFAULT FALSE,
-    delivery BOOLEAN NOT NULL DEFAULT FALSE,
-    payment_made VARCHAR(30) NOT NULL,
+    is_pickup BOOLEAN NOT NULL DEFAULT FALSE,
+    is_delivery BOOLEAN NOT NULL DEFAULT FALSE,
+    payment_status VARCHAR(30) NOT NULL,
     total_amount INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
-    FOREIGN KEY (chef_id) REFERENCES chef(chef_id)
+    FOREIGN KEY (chef_id) REFERENCES chef(chef_id),
+    FOREIGN KEY (customer_address_id) REFERENCES customer_address(address_id)
 );
 
 -- Creating the Order_Items table with a composite primary key

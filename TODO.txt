@@ -1,2 +1,4 @@
 1. Masking of passwords
-2.have the checks for the phone number
+2. have the checks for the phone number
+3. have the validations for email
+4. handle the auto_close_time and make the restaurant closed
